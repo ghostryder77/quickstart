@@ -99,10 +99,24 @@ resource "aws_security_group" "rancher_sg_allowall" {
   name = "${var.prefix}-allowall"
 
   ingress {
+    from_port   = "443"
+    to_port     = "443"
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = "22"
+    to_port     = "22"
+    protocol    = "tcp"
+    cidr_blocks = ["218.69.11.110/32"]
+  }
+
+  ingress {
     from_port   = "0"
     to_port     = "0"
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    self = "true"
   }
 
   egress {
@@ -265,7 +279,7 @@ data "template_file" "userdata_agent" {
     cluster_name         = "${var.cluster_name}"
     docker_version_agent = "${var.docker_version_agent}"
     rancher_version      = "${var.rancher_version}"
-    server_address       = "${aws_instance.rancherserver.public_ip}"
+    server_address       = "${aws_instance.rancherserver.private_ip}"
   }
 }
 
