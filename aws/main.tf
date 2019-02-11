@@ -65,6 +65,16 @@ variable "type" {
   description = "Amazon AWS Instance Type"
 }
 
+variable "server_type" {
+  default     = "t3.medium"
+  description = "Rancher server Amazon AWS Instance Type"
+}
+
+variable "worker_type" {
+  default     = "t3.medium"
+  description = "Rancher worker Amazon AWS Instance Type"
+}
+
 variable "docker_version_server" {
   default     = "17.03"
   description = "Docker Version to run on Rancher Server"
@@ -141,7 +151,7 @@ data "template_cloudinit_config" "rancherserver-cloudinit" {
 
 resource "aws_instance" "rancherserver" {
   ami             = "${data.aws_ami.ubuntu.id}"
-  instance_type   = "${var.type}"
+  instance_type   = "${var.server_type}"
   key_name        = "${var.ssh_key_name}"
   security_groups = ["${aws_security_group.rancher_sg_allowall.name}"]
   user_data       = "${data.template_cloudinit_config.rancherserver-cloudinit.rendered}"
@@ -249,7 +259,7 @@ data "template_cloudinit_config" "rancheragent-worker-cloudinit" {
 resource "aws_instance" "rancheragent-worker" {
   count           = "${var.count_agent_worker_nodes}"
   ami             = "${data.aws_ami.ubuntu.id}"
-  instance_type   = "${var.type}"
+  instance_type   = "${var.worker_type}"
   key_name        = "${var.ssh_key_name}"
   security_groups = ["${aws_security_group.rancher_sg_allowall.name}"]
   user_data       = "${data.template_cloudinit_config.rancheragent-worker-cloudinit.*.rendered[count.index]}"
