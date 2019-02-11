@@ -70,6 +70,16 @@ variable "server_type" {
   description = "Rancher server Amazon AWS Instance Type"
 }
 
+variable "controlplane_type" {
+  default     = "t3.small"
+  description = "Rancher controlplane Amazon AWS Instance Type"
+}
+
+variable "etcd_type" {
+  default     = "t3.small"
+  description = "Rancher etcd Amazon AWS Instance Type"
+}
+
 variable "worker_type" {
   default     = "t3.medium"
   description = "Rancher worker Amazon AWS Instance Type"
@@ -205,7 +215,7 @@ data "template_cloudinit_config" "rancheragent-etcd-cloudinit" {
 resource "aws_instance" "rancheragent-etcd" {
   count           = "${var.count_agent_etcd_nodes}"
   ami             = "${data.aws_ami.ubuntu.id}"
-  instance_type   = "${var.type}"
+  instance_type   = "${var.etcd_type}"
   key_name        = "${var.ssh_key_name}"
   security_groups = ["${aws_security_group.rancher_sg_allowall.name}"]
   user_data       = "${data.template_cloudinit_config.rancheragent-etcd-cloudinit.*.rendered[count.index]}"
@@ -232,7 +242,7 @@ data "template_cloudinit_config" "rancheragent-controlplane-cloudinit" {
 resource "aws_instance" "rancheragent-controlplane" {
   count           = "${var.count_agent_controlplane_nodes}"
   ami             = "${data.aws_ami.ubuntu.id}"
-  instance_type   = "${var.type}"
+  instance_type   = "${var.controlplane_type}"
   key_name        = "${var.ssh_key_name}"
   security_groups = ["${aws_security_group.rancher_sg_allowall.name}"]
   user_data     = "${data.template_cloudinit_config.rancheragent-controlplane-cloudinit.*.rendered[count.index]}"
