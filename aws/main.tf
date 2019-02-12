@@ -285,6 +285,7 @@ resource "aws_instance" "rancheragent-worker" {
   user_data       = "${data.template_cloudinit_config.rancheragent-worker-cloudinit.*.rendered[count.index]}"
 
   ebs_block_device {
+    device_name = "/dev/sdf"
     volume_type = "${var.worker_volume_type}"
     volume_size = "${var.worker_volume_size}"
     delete_on_termination = true
