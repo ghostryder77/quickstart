@@ -85,6 +85,16 @@ variable "worker_type" {
   description = "Rancher worker Amazon AWS Instance Type"
 }
 
+variable "worker_volume_type" {
+  default     = "gp2"
+  description = "EBS type on worker nodes"
+}
+
+variable "worker_volume_size" {
+  default     = "10"
+  description = "EBS size on worker nodes"
+}
+
 variable "docker_version_server" {
   default     = "17.03"
   description = "Docker Version to run on Rancher Server"
@@ -273,6 +283,12 @@ resource "aws_instance" "rancheragent-worker" {
   key_name        = "${var.ssh_key_name}"
   security_groups = ["${aws_security_group.rancher_sg_allowall.name}"]
   user_data       = "${data.template_cloudinit_config.rancheragent-worker-cloudinit.*.rendered[count.index]}"
+
+  ebs_block_device {
+    volume_type = "${var.worker_volume_type}"
+    volume_size = "${var.worker_volume_size}"
+    delete_on_termination = true
+  }
 
   tags {
     Name = "${var.prefix}-rancheragent-${count.index}-worker"
